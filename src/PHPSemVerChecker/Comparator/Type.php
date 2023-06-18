@@ -2,7 +2,9 @@
 
 namespace PHPSemVerChecker\Comparator;
 
+use PhpParser\Node\IntersectionType;
 use PhpParser\Node\NullableType;
+use PhpParser\Node\UnionType;
 
 class Type
 {
@@ -30,6 +32,14 @@ class Type
 
 		if ($type instanceof NullableType) {
 			return '?'.static::get($type->type);
+		}
+
+		if ($type instanceof UnionType) {
+			return implode('|', array_map(static fn($type) => static::get($type), $type->types));
+		}
+
+		if ($type instanceof IntersectionType) {
+			return implode('&', array_map(static fn($type) => static::get($type), $type->types));
 		}
 
 		return $type->toString();
